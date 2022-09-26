@@ -8,9 +8,11 @@ In most cases, the license for SAP sample projects is `Apache 2.0`.
 
 2. The README.md file (this file):
 
-3. the splitter.exe file 
+3. the bin folder
+The folder containing the pre-built executable for your convenient testing
 
-4. The source code in src folder
+4. The src folder
+The foler of Python source code which you can download and rebuild
 
 ## Description
 <!-- Please include SEO-friendly description -->
@@ -18,14 +20,14 @@ In most cases, the license for SAP sample projects is `Apache 2.0`.
 ## Requirements
 We expect that the target audience of this extended program to be a group of skilled users in the usage of SAP S/4HANA Migration Cockpit with good understanding of the template file and its way of data provisioning.
 
-## To run or rebuild
+## To Run or Rebuild
 1. The exe file shipped in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations.
 2. The only input to this program MUST be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
-2. Follow the command line prompt to input following parameters in order:
-   * 2.1 the name of oversized source file which you want to break into smaller ones
-   * 2.2 the number of target files you want to generate as a result
-   * 2.3 Start the split process by pressing Enter and monitor the task progress in console output
-3. To build the program from scratch, just download the source code and build it with a pre-installed Python environment.
+3. Follow the command line prompt to input following parameters in order:
+   * 3.1 the name of oversized source file which you want to break into smaller ones
+   * 3.2 the number of target files you want to generate as a result
+   * 3.3 Start the split process by pressing Enter and monitor the task progress in console output
+4. To build the program from scratch, just download the source code and build it with your local pre-installed Python environment.
 
 ## Known Issues
 None for the time being.
