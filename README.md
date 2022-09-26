@@ -16,21 +16,22 @@ In most cases, the license for SAP sample projects is `Apache 2.0`.
 <!-- Please include SEO-friendly description -->
 
 ## Requirements
-We expect the target audience of this extended program to be a group of skilled users in SAP S/4HANA Migration Cockpit with good understanding of the template file and the way of data provisioning.
+We expect that the target audience of this extended program to be a group of skilled users in the usage of SAP S/4HANA Migration Cockpit with good understanding of the template file and its way of data provisioning.
 
-## Download and Installation
-1. The exe file offered in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations and the only input to it should be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
+## To run or rebuild
+1. The exe file shipped in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations.
+2. The only input to this program MUST be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
 2. Follow the command line prompt to input following parameters in order:
-   2.1 the oversized source file which you want to break into smaller ones
-   2.2 the number of smaller files you want to generate
-   2.3 press Enter to start the split process
-3. To build the program by youself, just download and build the source code with a pre-installed Python environment.
+   *2.1 the name of oversized source file which you want to break into smaller ones
+   *2.2 the number of target files you want to generate as a result
+   *2.3 Start the split process by pressing Enter and monitor the task progress in console output
+3. To build the program from scratch, just download the source code and build it with a pre-installed Python environment.
 
 ## Known Issues
 None for the time being.
 
 ## How to obtain support
-[Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
+[Create an issue](https://github.com/SAP-samples/s4hana-mc-xml-file-splitter/issues) in this repository if you find a bug or have questions about the content.
  
 For additional support, [ask a question in SAP Community](https://answers.sap.com/questions/ask.html).
 
