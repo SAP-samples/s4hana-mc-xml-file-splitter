@@ -1,33 +1,33 @@
-# SAP-samples/repository-template
-This default template for SAP Samples repositories includes files for README, LICENSE, and .reuse/dep5. All repositories on github.com/SAP-samples will be created based on this template.
+# SAP-samples/s4hana-mc-xml-file-splitter
+Sample code of a small command line interface program implemented in Python, to facilitate customers’ data migration by splitting oversized XML data file into smaller ones which can then be fed into S/4 HANA Migration Cockpit File Staging approach for further processing without causing too much memory overhead and network traffic timeout.
 
 # Containing Files
 
 1. The LICENSE file:
 In most cases, the license for SAP sample projects is `Apache 2.0`.
 
-2. The .reuse/dep5 file: 
-The [Reuse Tool](https://reuse.software/) must be used for your samples project. You can find the .reuse/dep5 in the project initial. Please replace the parts inside the single angle quotation marks < > by the specific information for your repository.
+2. The README.md file (this file):
 
-3. The README.md file (this file):
-Please edit this file as it is the primary description file for your project. You can find some placeholder titles for sections below.
+3. the splitter.exe file 
 
-# [Title]
-<!-- Please include descriptive title -->
-
-<!--- Register repository https://api.reuse.software/register, then add REUSE badge:
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/REPO-NAME)](https://api.reuse.software/info/github.com/SAP-samples/REPO-NAME)
--->
+4. The source code in src folder
 
 ## Description
 <!-- Please include SEO-friendly description -->
 
 ## Requirements
+We expect the target audience of this extended program to be a group of skilled users in SAP S/4HANA Migration Cockpit with good understanding of the template file and the way of data provisioning.
 
 ## Download and Installation
+1. The exe file offered in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations and the only input to it should be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
+2. Follow the command line prompt to input following parameters in order:
+   2.1 the oversized source file which you want to break into smaller ones
+   2.2 the number of smaller files you want to generate
+   2.3 press Enter to start the split process
+3. To build the program by youself, just download and build the source code with a pre-installed Python environment.
 
 ## Known Issues
-<!-- You may simply state "No known issues. -->
+None for the time being.
 
 ## How to obtain support
 [Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
