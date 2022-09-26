@@ -1,4 +1,4 @@
-# SAP-samples/s4hana-mc-xml-file-splitter
+# S/4HANA Migration Cockpit XML File Splitter
 Sample code of a small command line interface program implemented in Python, to facilitate customers’ data migration by splitting oversized XML data file into smaller ones which can then be fed into S/4 HANA Migration Cockpit File Staging approach for further processing without causing too much memory overhead and network traffic timeout.
 
 ## Containing Files
@@ -17,11 +17,11 @@ We expect that the target audience of this extended program to be a group of ski
 
 ## How to Run or Rebuild
 1. The exe file shipped in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations.
-2. The only input to this program MUST be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
+2. The sole input to this program SHALL be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
 3. Follow the command line prompt to input following parameters in order:
    * 3.1 the name of oversized source file which you want to break into smaller ones
    * 3.2 the number of target files you want to generate as a result
-   * 3.3 Start the split process by pressing Enter and monitor the task progress in console output
+   * 3.3 start the split process by pressing Enter and monitor the task progress in console output
 4. To build the program from scratch, just download the source code and build it with your local pre-installed Python environment.
 
 ## Known Issues
