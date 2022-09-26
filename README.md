@@ -6,10 +6,11 @@ Sample code of a small command line interface program implemented in Python, to 
 1. The LICENSE file:
 In most cases, the license for SAP sample projects is `Apache 2.0`.
 2. The README.md file (this file):
-3. the bin folder:
-The folder containing the pre-built executable for your convenient testing
+Explanatory doc of this project
+3. The bin folder:
+The folder containing the pre-built executable for testing conveniently
 4. The src folder:
-The foler of Python source code which you can download and rebuild
+The folder of Python source code which you can download and rebuild
 
 ## Requirements
 We expect that the target audience of this extended program to be a group of skilled users in the usage of SAP S/4HANA Migration Cockpit with good understanding of the template file and its way of data provisioning.
