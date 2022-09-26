@@ -22,9 +22,9 @@ We expect that the target audience of this extended program to be a group of ski
 1. The exe file shipped in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations.
 2. The only input to this program MUST be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
 2. Follow the command line prompt to input following parameters in order:
-   *2.1 the name of oversized source file which you want to break into smaller ones
-   *2.2 the number of target files you want to generate as a result
-   *2.3 Start the split process by pressing Enter and monitor the task progress in console output
+   * 2.1 the name of oversized source file which you want to break into smaller ones
+   * 2.2 the number of target files you want to generate as a result
+   * 2.3 Start the split process by pressing Enter and monitor the task progress in console output
 3. To build the program from scratch, just download the source code and build it with a pre-installed Python environment.
 
 ## Known Issues
