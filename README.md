@@ -13,16 +13,16 @@ The folder containing the pre-built executable for testing conveniently
 The folder of Python source code which you can download and rebuild
 
 ## Requirements
-We expect that the target audience of this extended program to be a group of skilled users in the usage of SAP S/4HANA Migration Cockpit with good understanding of the template file and its way of data provisioning.
+1. It's favorable that the target audience of this extended program to be a group of experienced users with their good understanding in how to work with the SAP S/4HANA Migration Cockpit File Staging approach, the template file and its way of data provisioning.
+2. The sole input to this program SHALL be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
 
 ## How to Run or Rebuild
-1. The exe file shipped in this project's bin folder can be downloaded and run independently on Windows OS without any additional settings or configurations.
-2. The sole input to this program SHALL be a legitimate S/4HANA Migraiton Cockpit File Staging compatible data file.
-3. Follow the command line prompt to input following parameters in order:
-   * 3.1 the name of oversized source file which you want to break into smaller ones
+1. The exe file shipped in this project's bin folder can be downloaded and run independently on Windows OS without additional settings or configurations.
+2. To run the splitter correctly, follow the command line prompt with following input in order:
+   * 3.1 the name of the oversized source data file which you want to break into smaller ones
    * 3.2 the number of target files you want to generate as a result
-   * 3.3 start the split process by pressing Enter and monitor the task progress in console output
-4. To build the program from scratch, just download the source code and build it with your local pre-installed Python environment.
+   * 3.3 press Enter to start the split process and monitor the task progress in console output
+3. To build the program from scratch, just download the source code and build it with your local pre-installed Python environment.
 
 ## Known Issues
 None for the time being.
