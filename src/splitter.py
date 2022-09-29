@@ -1,347 +1,370 @@
-"""
-Implements the xml splitter, split xml file to several small size files
-"""
+# Copyright: 2022 SAP SE or an SAP affiliate company
+#
+# License: Apache-2.0
 
 import os
-from progressbar import *
+from progressbar import ProgressBar,Percentage
 
-class xmlSplitter:
-    __oneSheetItems = 50000
-    __lastFileItems = 0
-    __fileNum = 0
-    __fileFullName = ""
-    __fileName = ""
-    __tabFinished = False
-    __splittedFinished = True
-    __splittedKeyList = []
-    __keyNum = 0
-    __subSheetRowList = []
-    __rowCount = 0
-    __columnNum = 0
-    __hashKey = ""
-    __hasInvalidData = False
-    __tempFileName = ""
-    __tempGeneratedName = ""
+
+class XmlSplitter:
+    """
+    Implements the xml splitter, split xml file to several small size files
+    """
+    __each_file_instances = 50000
+    __last_file_instances = 0
+    __file_num = 0
+    __file_fullname = ""
+    __file_name = ""
+    __table_finish = False
+    __split_finish = True
+    __keylist = []
+    __key_num = 0
+    __subsheet_rowlist = []
+    __row_count = 0
+    __column_num = 0
+    __hashkey = ""
+    __invalid = False
+    __buffer_filename = ""
+    __temp_filename = ""
+    __instance_count = 0
+    __main_sheet_rows = 0
+    __find_key_row = False
+    __file_lines = 0
+    __buffer_file_lines = 0
+
     __ABAP_CR_LF = '\r\n'
-    __itemCount = 0
-    __mainSheetRowCount = 0
-    __findKeyRow = False
-    __fileLines = 0
-    __newFileLines = 0
+    __WORKSHEET_PREFIX = "<Worksheet ss:Name"
+    __ROW_PREFIX = "<Row"
+    __CELL_PREFIX = "<Cell"
+    __DATA_PREFIX = "<Data"
+    __MERGE_ACCESS_PREFIX = "ss:MergeAcross"
 
-    def __init__(self,fullName:str,fileNum:int):
+    __TABLE_SUFFIX = "</Table>"
+    __ROW_SUFFIX = "</Row>"
+    __CELL_SUFFIX = "</Cell>"
+    __DATA_SUFFIX = "</Data>"
+
+    def __init__(self, full_name: str, file_num: int):
         """
         Constructor, initialize variables 
-        :param fullName: xml file full name, includes the path
-        :param fileNum: the count of splitted files
+        :param full_name: xml file full name, includes the path
+        :param file_num: the count of splitted files
         """
-        self.__fileFullName = fullName
-        self.__fileNum = fileNum
-        self.__fileName = self.__fileFullName.split('.')[0]
-        self.__tempFileName = self.__fileName + "_bak" + '.xml' 
-        self.__tempGeneratedName = self.__fileName + "_bak"  + "_tmp.xml" 
-        if os.path.isfile(self.__tempFileName) == True: 
-            raise NameError(self.__tempFileName + " already exists.")
-        if os.path.isfile(self.__tempGeneratedName) == True: 
-            raise NameError(self.__tempGeneratedName + " already exists.")
+        self.__file_fullname = full_name
+        self.__file_num = file_num
+        self.__file_name = self.__file_fullname.split('.')[0]
+        self.__buffer_filename = self.__file_name + "_bak" + '.xml'
+        self.__temp_filename = self.__file_name + "_bak" + "_tmp.xml"
+        if os.path.isfile(self.__buffer_filename) is True:
+            raise NameError(self.__buffer_filename + " already exists.")
+        if os.path.isfile(self.__temp_filename) is True:
+            raise NameError(self.__temp_filename + " already exists.")
         self.__initialize()
 
-    def __createXmlByKey(self,idx:str)->bool:
+    def __create_file(self, idx: str) -> bool:
         """
         Create splitted xml file by keys
         :param idx: the index of splitted xml file
         :return: Splitting files finished or not
         """
-        workSheet = 0
-        splittedFileName = self.__fileName + idx + '.xml'
-        self.__newFileLines = 0
+        worksheet = 0
+        splitted_filename = self.__file_name + idx + '.xml'
+        self.__buffer_file_lines = 0
         count = 0
-        self.__keyNum = 0
-        self.__splittedFinished = True
-        self.__hasInvalidData = False
-        self.__splittedKeyList = []
+        self.__key_num = 0
+        self.__split_finish = True
+        self.__invalid = False
+        self.__keylist = []
+        newline = ""
 
-        if os.path.isfile(splittedFileName) == True:  
-            raise NameError(splittedFileName + " already exists.")
-        
-        print("Generate file " + splittedFileName + ":" + idx + "/" + str(self.__fileNum))
+        if os.path.isfile(splitted_filename) is True:
+            raise NameError(splitted_filename + " already exists.")
 
-        if int(idx) == self.__fileNum:
-            self.__oneSheetItems = self.__lastFileItems
+        if int(idx) == self.__file_num:
+            self.__each_file_instances = self.__last_file_instances
 
-        originFile = ""
-        if os.path.isfile(self.__tempFileName) == True:
-            originFile = self.__tempFileName
+        original_file_name = ""
+        if os.path.isfile(self.__buffer_filename) is True:
+            original_file_name = self.__buffer_filename
         else:
-            originFile = self.__fileFullName    
+            original_file_name = self.__file_fullname
 
-        bar = self.__getPercentageProgress(splittedFileName)
+        progress_bar = self.__get_progress(splitted_filename)
 
-        with open(originFile, 'r',encoding='utf-8') as oldFile:
-            with open(self.__tempGeneratedName, 'w+',encoding='utf-8') as newFile:
-                with open(self.__fileName + idx + '.xml', 'w+',encoding='utf-8') as splittedFile:
-                    for line in oldFile:
+        with open(original_file_name, "r", encoding="utf-8") as original_file:
+            with open(self.__temp_filename, "w+", encoding="utf-8") as buffer_file:
+                with open(self.__file_name + idx + ".xml", "w+", encoding="utf-8") as splitted_file:
+                    for line in original_file:
                         count += 1
-                        try:
-                            bar.update(int(count*100/self.__fileLines))
-                        except Exception as err:
-                            print("count:" + str(count))
-                            print("fileLines:" + str(self.__fileLines))
-                            raise Exception(" dump")
-                        line = line.strip() + self.__ABAP_CR_LF 
-                        if line.find('<Worksheet ss:Name') != -1:
-                            self.__tabFinished = False
-                            self.__rowCount = 0
-                            self.__columnNum = 0           
-                            workSheet = workSheet + 1            
-                        if workSheet < 3:
-                            self.__newFileLines += 1
-                            newFile.write(line)
-                            splittedFile.write(line)
+                        progress_bar.update(int(count*100/self.__file_lines))
+                        newline = line.strip() + self.__ABAP_CR_LF
+                        if line.find(self.__WORKSHEET_PREFIX) != -1:
+                            self.__table_finish = False
+                            self.__row_count = 0
+                            self.__column_num = 0
+                            worksheet = worksheet + 1
+                        if worksheet < 3:
+                            self.__buffer_file_lines += 1
+                            buffer_file.write(line)
+                            splitted_file.write(newline)
                             continue
-                        if workSheet == 3:
-                            self.__parseMainSheet(line, newFile, splittedFile)
+                        if worksheet == 3:
+                            self.__parse_main_sheet(
+                                line, buffer_file, splitted_file)
                         else:
-                            self.__parseSubSheet(line, newFile, splittedFile)
-                splittedFile.close()    
-            newFile.close()                                                 
-        oldFile.close()
-        self.__fileLines = self.__newFileLines
+                            self.__parse_subsheet(
+                                line, buffer_file, splitted_file)
+                splitted_file.close()
+            buffer_file.close()
+        original_file.close()
+        self.__file_lines = self.__buffer_file_lines
 
-        if os.path.isfile(self.__tempFileName) == True:     
-            os.remove(self.__tempFileName)
-        os.rename(self.__tempGeneratedName,self.__tempFileName)
+        if os.path.isfile(self.__buffer_filename) is True:
+            os.remove(self.__buffer_filename)
+        os.rename(self.__temp_filename, self.__buffer_filename)
 
-        if self.__splittedFinished == True:
-            if os.path.isfile(self.__tempFileName) == True:  
-                if self.__hasInvalidData == False:
-                    os.remove(self.__tempFileName)
+        if self.__split_finish is True:
+            if os.path.isfile(self.__buffer_filename) is True:
+                if self.__invalid is False:
+                    os.remove(self.__buffer_filename)
                 else:
-                    os.rename(self.__tempFileName,self.__fileName + '_invalid_data' + '.xml')
-        return self.__splittedFinished
+                    os.rename(self.__buffer_filename,
+                              self.__file_name + "_invalid_data" + ".xml")
+        return self.__split_finish
 
     def __initialize(self):
         """
-        Scan the original file and get the count of items and the lines of the file.
+        Scan the original file and get the count of instances and the lines of the file.
         """
-        print("Prepare to start.")
-        workSheet = 0
-        rowCount = 0
-        scanMainFinished = False
-        if os.path.isfile(self.__fileFullName) !=  True:  
-            raise NameError(self.__fileFullName + " does not exist")
-        with open(self.__fileFullName, 'r',encoding='utf-8') as File:
-            for line in File:
-                self.__fileLines += 1
-                if scanMainFinished is True:
+        worksheet = 0
+        row_count = 0
+        header_count = 0
+        scan_main_finish = False
+        if os.path.isfile(self.__file_fullname) is not True:
+            raise NameError(self.__file_fullname + " does not exist")
+        with open(self.__file_fullname, "r", encoding="utf-8") as original_file:
+            for line in original_file:
+                self.__file_lines += 1
+                if scan_main_finish is True:
                     continue
-                if line.find('<Worksheet ss:Name') != -1:
-                    workSheet = workSheet + 1 
-                if workSheet < 3:
+                if line.find(self.__WORKSHEET_PREFIX) != -1:
+                    worksheet = worksheet + 1
+                if worksheet < 3:
                     continue
-                if workSheet == 3:
-                    if line.find('<Row') != -1:
-                        rowCount += 1
-                    if line.find('</Table>') != -1:
-                        scanMainFinished = True
-                        continue
-        File.close()  
+                if worksheet == 3:
+                    if line.find(self.__ROW_PREFIX) != -1:
+                        if header_count < 8:
+                            header_count += 1
+                        else:
+                            row_count += 1
+                            scan_instances = "Scanning file instances:" + \
+                                str(row_count)
+                            print(scan_instances, end="")
+                            print("\b" * (len(scan_instances)),
+                                  end="", flush=True)
 
-        self.__itemCount = rowCount - 8
-        if self.__itemCount < self.__fileNum:
+                    if line.find(self.__TABLE_SUFFIX) != -1:
+                        scan_main_finish = True
+                        continue
+        original_file.close()
+        print("")
+
+        self.__instance_count = row_count
+        if self.__instance_count < self.__file_num:
             raise NameError("The number of splitted files is too big")
-        if self.__itemCount % self.__fileNum == 0:
-            self.__oneSheetItems = self.__itemCount / self.__fileNum 
-            self.__lastFileItems = self.__oneSheetItems
+        if self.__instance_count % self.__file_num == 0:
+            self.__each_file_instances = self.__instance_count / self.__file_num
+            self.__last_file_instances = self.__each_file_instances
         else:
-            self.__oneSheetItems = self.__itemCount // self.__fileNum + 1     #Round up 
-            self.__lastFileItems = self.__itemCount - self.__oneSheetItems * (self.__fileNum - 1)
+            self.__each_file_instances = self.__instance_count // self.__file_num  # Round down
+            self.__last_file_instances = self.__instance_count - \
+                self.__each_file_instances * (self.__file_num - 1)
+        print(f"A total of {self.__file_num} files will be generated...")
 
     def split(self):
         """
         Start splitting.
         """
-        isFinished = False
+        finish = False
         idx = 0
-        while( isFinished == False ):
+        while finish is False:
             idx += 1
-            isFinished = self.__createXmlByKey(str(idx))  
+            finish = self.__create_file(str(idx))
             print("")
-        print("Splitting finished")
+        print("Done with splitting.")
 
-    def __getPercentageProgress(self,fileName:str)->ProgressBar:
+    def __get_progress(self, filename: str) -> ProgressBar:
         """
         Get a new process bar.
-        :param fileName: the file lines in main sheet
+        :param filename: the file lines in main sheet
         :return:  progressbar instance
         """
-        widgets = [ 
-            "Generate file " + str(fileName) + ":",
+        widgets = [
+            "Generating file " + str(filename) + ":",
             Percentage()
-        ] 
-        bar = ProgressBar(widgets=widgets).start()
-        return bar    
+        ]
+        progress_bar = ProgressBar(widgets=widgets).start()
+        return progress_bar
 
-    def __parseMainSheet(self,line, newFile, splittedFile):
+    def __parse_main_sheet(self, line: str, buffer_file, splitted_file):
         """
         Parse the main sheet.
         :param line: the file lines in main sheet
-        :param newFile: the new xml file which excludes the splitted items
-        :param splittedFile: the splitted xml file
+        :param buffer_file: the buffer xml file which excludes the splitted items
+        :param splitted_file: the generated xml file
         """
-        if self.__tabFinished == True:
-            self.__newFileLines += 1
-            newFile.write(line)
-            splittedFile.write(line)
+        newline = line.strip() + self.__ABAP_CR_LF
+        if self.__table_finish is True:
+            self.__buffer_file_lines += 1
+            buffer_file.write(line)
+            splitted_file.write(newline)
             return
-        if line.find('</Table>') != -1:
-            self.__tabFinished = True
-            self.__newFileLines += 1
-            newFile.write(line)
-            splittedFile.write(line)
+        if line.find(self.__TABLE_SUFFIX) != -1:
+            self.__table_finish = True
+            self.__buffer_file_lines += 1
+            buffer_file.write(line)
+            splitted_file.write(newline)
             return
-        if self.__splittedFinished == False:
-            self.__newFileLines += 1
-            newFile.write(line)
+        if self.__split_finish is False:
+            self.__buffer_file_lines += 1
+            buffer_file.write(line)
             return
-        if self.__keyNum == 0:
-            if line.find('<Row') != -1:      
-                self.__mainSheetRowCount += 1
-                if self.__mainSheetRowCount == 7:
-                    self.__findKeyRow = True
-                    self.__newFileLines += 1
-                    newFile.write(line)
-                    splittedFile.write(line)
+        if self.__key_num == 0:
+            if line.find(self.__ROW_PREFIX) != -1:
+                self.__main_sheet_rows += 1
+                if self.__main_sheet_rows == 7:
+                    self.__find_key_row = True
+                    self.__buffer_file_lines += 1
+                    buffer_file.write(line)
+                    splitted_file.write(newline)
                     return
-            if line.find('<Cell') != -1 and self.__findKeyRow == True:
-                mergeAcrossPos = line.find('ss:MergeAcross')
-                if mergeAcrossPos != -1:
-                    splitList = line.split()
-                    mergedNum = int(splitList[1].split("\"")[1])
-                    self.__keyNum = mergedNum + 1
+            if line.find(self.__CELL_PREFIX) != -1 and self.__find_key_row is True:
+                mergeacross_pos = line.find(self.__MERGE_ACCESS_PREFIX)
+                if mergeacross_pos != -1:
+                    splitlist = line.split()
+                    merged_num = int(splitlist[1].split("\"")[1])
+                    self.__key_num = merged_num + 1
                 else:
-                    self.__keyNum = 1
-                self.__newFileLines += 1
-                newFile.write(line)
-                splittedFile.write(line)
-                self.__findKeyRow = False
-                self.__mainSheetRowCount = 0
+                    self.__key_num = 1
+                self.__buffer_file_lines += 1
+                buffer_file.write(line)
+                splitted_file.write(newline)
+                self.__find_key_row = False
+                self.__main_sheet_rows = 0
             else:
-                self.__newFileLines += 1
-                newFile.write(line)
-                splittedFile.write(line)
+                self.__buffer_file_lines += 1
+                buffer_file.write(line)
+                splitted_file.write(newline)
                 return
         else:
-            if line.find('<Row') != -1:
-                self.__rowCount += 1
-                self.__hashKey = ""
-                self.__columnNum = 0
-                if self.__rowCount > (self.__oneSheetItems + 1):
-                    self.__splittedFinished = False
-                    self.__newFileLines += 1
-                    newFile.write(line)
+            if line.find(self.__ROW_PREFIX) != -1:
+                self.__row_count += 1
+                self.__hashkey = ""
+                self.__column_num = 0
+                if self.__row_count > (self.__each_file_instances + 1):
+                    self.__split_finish = False
+                    self.__buffer_file_lines += 1
+                    buffer_file.write(line)
                     return
-                if self.__rowCount > 1:
-                    splittedFile.write(line)
+                if self.__row_count > 1:
+                    splitted_file.write(newline)
                 else:
-                    self.__newFileLines += 1
-                    newFile.write(line)
-                    splittedFile.write(line)
+                    self.__buffer_file_lines += 1
+                    buffer_file.write(line)
+                    splitted_file.write(newline)
                 return
-            if self.__rowCount <= 1:
-                self.__newFileLines += 1
-                newFile.write(line)
-                splittedFile.write(line)
+            if self.__row_count <= 1:
+                self.__buffer_file_lines += 1
+                buffer_file.write(line)
+                splitted_file.write(newline)
                 return
-            if line.find('<Cell') != -1:
-                splittedFile.write(line)
-                self.__columnNum += 1
-                if self.__keyNum >= self.__columnNum:
-                    beginPos = line.find('<Data')
-                    endPos = line.find('</Data>')                            
-                    if endPos != -1 and beginPos != -1:
-                        dataStr = line[beginPos:endPos]
-                        value = dataStr.split('>')[1]
+            if line.find(self.__CELL_PREFIX) != -1:
+                splitted_file.write(newline)
+                self.__column_num += 1
+                if self.__key_num >= self.__column_num:
+                    begin_pos = line.find(self.__DATA_PREFIX)
+                    end_pos = line.find(self.__DATA_SUFFIX)
+                    if end_pos != -1 and begin_pos != -1:
+                        data_str = line[begin_pos:end_pos]
+                        value = data_str.split('>')[1]
                         value = value.strip()
                     else:
                         value = ""
-                    if self.__hashKey == "":
-                        self.__hashKey = "{" + value + "}"
+                    if self.__hashkey == "":
+                        self.__hashkey = "{" + value + "}"
                     else:
-                        self.__hashKey = self.__hashKey + "|" + "{" + value + "}"
-                    if self.__keyNum == self.__columnNum:
-                        self.__splittedKeyList.append(self.__hashKey)
-            elif line.find('</Cell>') != -1:
-                splittedFile.write(line)
-            if line.find('</Row>') != -1:
-                splittedFile.write(line)
+                        self.__hashkey = self.__hashkey + \
+                            "|" + "{" + value + "}"
+                    if self.__key_num == self.__column_num:
+                        self.__keylist.append(self.__hashkey)
+            elif line.find(self.__CELL_SUFFIX) != -1:
+                splitted_file.write(newline)
+            if line.find(self.__ROW_SUFFIX) != -1:
+                splitted_file.write(newline)
 
-    def __parseSubSheet(self,line, newFile, splittedFile):
+    def __parse_subsheet(self, line: str, buffer_file, splitted_file):
         """
         Parse the sub sheets.
         :param line: the file lines in sub sheets
-        :param newFile: the new xml file which excludes the splitted items
-        :param splittedFile: the splitted xml file
+        :param buffer_file: the buffer xml file which excludes the splitted items
+        :param splitted_file: the splitted xml file
         """
-        if self.__tabFinished == True:
-            self.__newFileLines += 1
-            newFile.write(line)
-            splittedFile.write(line)
+        newline = line.strip() + self.__ABAP_CR_LF
+        if self.__table_finish is True:
+            self.__buffer_file_lines += 1
+            buffer_file.write(line)
+            splitted_file.write(newline)
             return
-        if line.find('</Table>') != -1:
-            self.__tabFinished = True
-            self.__newFileLines += 1
-            newFile.write(line)
-            splittedFile.write(line)
-            return                   
-        if line.find('<Row') != -1:
-            self.__rowCount += 1
-            self.__hashKey = ""
-            if self.__rowCount >= 9:
-                self.__columnNum = 0
-                self.__subSheetRowList = []
-                self.__subSheetRowList.append(line)
+        if line.find(self.__TABLE_SUFFIX) != -1:
+            self.__table_finish = True
+            self.__buffer_file_lines += 1
+            buffer_file.write(line)
+            splitted_file.write(newline)
+            return
+        if line.find(self.__ROW_PREFIX) != -1:
+            self.__row_count += 1
+            self.__hashkey = ""
+            if self.__row_count >= 9:
+                self.__column_num = 0
+                self.__subsheet_rowlist = []
+                self.__subsheet_rowlist.append(line)
             else:
-                self.__newFileLines += 1
-                newFile.write(line)
-                splittedFile.write(line)                                
+                self.__buffer_file_lines += 1
+                buffer_file.write(line)
+                splitted_file.write(newline)
             return
-        if self.__rowCount < 9:
-            self.__newFileLines += 1
-            newFile.write(line)
-            splittedFile.write(line)
+        if self.__row_count < 9:
+            self.__buffer_file_lines += 1
+            buffer_file.write(line)
+            splitted_file.write(newline)
             return
-        if line.find('<Cell') != -1: 
-            self.__subSheetRowList.append(line)                    
-            self.__columnNum += 1
-            if self.__keyNum >= self.__columnNum:
-                beginPos = line.find('<Data')
-                endPos = line.find('</Data>')                            
-                if endPos != -1 and beginPos != -1:
-                    dataStr = line[beginPos:endPos]
-                    value = dataStr.split('>')[1]
+        if line.find(self.__CELL_PREFIX) != -1:
+            self.__subsheet_rowlist.append(line)
+            self.__column_num += 1
+            if self.__key_num >= self.__column_num:
+                begin_pos = line.find(self.__DATA_PREFIX)
+                end_pos = line.find(self.__DATA_SUFFIX)
+                if end_pos != -1 and begin_pos != -1:
+                    data_str = line[begin_pos:end_pos]
+                    value = data_str.split(">")[1]
                     value = value.strip()
                 else:
                     value = ""
-                if self.__hashKey == "":
-                    self.__hashKey = "{" + value + "}"
+                if self.__hashkey == "":
+                    self.__hashkey = "{" + value + "}"
                 else:
-                    self.__hashKey = self.__hashKey + "|" + "{" + value + "}"                
-        elif line.find('</Cell>') != -1:
-            self.__subSheetRowList.append(line)  
-        if line.find('</Row>') != -1:
-            self.__subSheetRowList.append(line)
-            if self.__hashKey in self.__splittedKeyList:
-                for row in self.__subSheetRowList:
-                    splittedFile.write(row)
+                    self.__hashkey = self.__hashkey + "|" + "{" + value + "}"
+        elif line.find(self.__CELL_SUFFIX) != -1:
+            self.__subsheet_rowlist.append(line)
+        if line.find(self.__ROW_SUFFIX) != -1:
+            self.__subsheet_rowlist.append(line)
+            if self.__hashkey in self.__keylist:
+                for row in self.__subsheet_rowlist:
+                    new_row = row.strip() + self.__ABAP_CR_LF
+                    splitted_file.write(new_row)
             else:
-                if len(self.__subSheetRowList) > 0:
-                    self.__hasInvalidData = True
-                for row in self.__subSheetRowList:
-                    self.__newFileLines += 1
-                    newFile.write(row)   
-
-
-        
-
-    
+                if len(self.__subsheet_rowlist) > 0:
+                    self.__invalid = True
+                for row in self.__subsheet_rowlist:
+                    self.__buffer_file_lines += 1
+                    buffer_file.write(row)
