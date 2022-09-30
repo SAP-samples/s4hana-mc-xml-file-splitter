@@ -11,6 +11,7 @@ def print_help():
     """
     Print help document
     """
+
     print("Split oversized MC files into smaller units which can then be fed into S/4 HANA Migration Cockpit File Staging approach for further processing of data provisioning.")
     print("--version 1.0")
     print("")
@@ -21,18 +22,18 @@ def main():
     The main entry
     """
     print_help()
-
+    os.system("")
     while True:
         filename = input("Please enter file name:")
         if filename == "":
-            print("[Error]File name cannot be empty")
+            print("\033[31mFile name cannot be empty\033[0m")
             continue
         uppercase_name = filename.upper()
         if uppercase_name.find(".XML") == -1:
-            print("[Error]input file is not XML file")
+            print("\033[31minput file is not XML file\033[0m")
             continue
         if os.path.isfile(uppercase_name) is not True:
-            print("[Error]" + uppercase_name + " does not exist")
+            print(f"\033[31m{uppercase_name} does not exist\033[0m")
             continue
         break
 
@@ -41,10 +42,10 @@ def main():
         try:
             file_num = int(num)
         except Exception:
-            print("[Error]Input value should be numbers")
+            print("\033[31mInput value should be numbers\033[0m")
             continue
         if file_num <= 1:
-            print("[Error]Input value should be bigger than 1")
+            print("\033[31mInput value should be bigger than 1\033[0m")
             continue
         break
 
@@ -55,7 +56,7 @@ def main():
         log_file = open("errors.log", "a+", encoding="utf-8")
         print_exc(file=log_file)
         log_file.close()
-        print(f"[Error]{error}")
+        print(f"\033[31m{error}\033[0m")
 
 
 if __name__ == "__main__":

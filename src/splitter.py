@@ -3,7 +3,7 @@
 # License: Apache-2.0
 
 import os
-from progressbar import ProgressBar,Percentage
+from progressbar import ProgressBar, Percentage, Bar
 
 
 class XmlSplitter:
@@ -201,7 +201,8 @@ class XmlSplitter:
         """
         widgets = [
             "Generating file " + str(filename) + ":",
-            Percentage()
+            Percentage(),
+            Bar("=")
         ]
         progress_bar = ProgressBar(widgets=widgets).start()
         return progress_bar
