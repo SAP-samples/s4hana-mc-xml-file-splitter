@@ -32,7 +32,6 @@ class XmlSplitter:
     __file_lines = 0
     __buffer_file_lines = 0
 
-    __ABAP_CR_LF = '\r\n'
     __WORKSHEET_PREFIX = "<Worksheet ss:Name"
     __ROW_PREFIX = "<Row"
     __CELL_PREFIX = "<Cell"
@@ -75,7 +74,6 @@ class XmlSplitter:
         self.__split_finish = True
         self.__invalid = False
         self.__keylist = []
-        newline = ""
 
         if os.path.isfile(splitted_filename) is True:
             raise NameError(splitted_filename + " already exists.")
@@ -97,7 +95,6 @@ class XmlSplitter:
                     for line in original_file:
                         count += 1
                         progress_bar.update(int(count*100/self.__file_lines))
-                        newline = line.strip() + self.__ABAP_CR_LF
                         if line.find(self.__WORKSHEET_PREFIX) != -1:
                             self.__table_finish = False
                             self.__row_count = 0
@@ -106,7 +103,7 @@ class XmlSplitter:
                         if worksheet < 3:
                             self.__buffer_file_lines += 1
                             buffer_file.write(line)
-                            splitted_file.write(newline)
+                            splitted_file.write(line)
                             continue
                         if worksheet == 3:
                             self.__parse_main_sheet(
@@ -214,17 +211,17 @@ class XmlSplitter:
         :param buffer_file: the buffer xml file which excludes the splitted items
         :param splitted_file: the generated xml file
         """
-        newline = line.strip() + self.__ABAP_CR_LF
+
         if self.__table_finish is True:
             self.__buffer_file_lines += 1
             buffer_file.write(line)
-            splitted_file.write(newline)
+            splitted_file.write(line)
             return
         if line.find(self.__TABLE_SUFFIX) != -1:
             self.__table_finish = True
             self.__buffer_file_lines += 1
             buffer_file.write(line)
-            splitted_file.write(newline)
+            splitted_file.write(line)
             return
         if self.__split_finish is False:
             self.__buffer_file_lines += 1
@@ -237,7 +234,7 @@ class XmlSplitter:
                     self.__find_key_row = True
                     self.__buffer_file_lines += 1
                     buffer_file.write(line)
-                    splitted_file.write(newline)
+                    splitted_file.write(line)
                     return
             if line.find(self.__CELL_PREFIX) != -1 and self.__find_key_row is True:
                 mergeacross_pos = line.find(self.__MERGE_ACCESS_PREFIX)
@@ -249,13 +246,13 @@ class XmlSplitter:
                     self.__key_num = 1
                 self.__buffer_file_lines += 1
                 buffer_file.write(line)
-                splitted_file.write(newline)
+                splitted_file.write(line)
                 self.__find_key_row = False
                 self.__main_sheet_rows = 0
             else:
                 self.__buffer_file_lines += 1
                 buffer_file.write(line)
-                splitted_file.write(newline)
+                splitted_file.write(line)
                 return
         else:
             if line.find(self.__ROW_PREFIX) != -1:
@@ -268,19 +265,19 @@ class XmlSplitter:
                     buffer_file.write(line)
                     return
                 if self.__row_count > 1:
-                    splitted_file.write(newline)
+                    splitted_file.write(line)
                 else:
                     self.__buffer_file_lines += 1
                     buffer_file.write(line)
-                    splitted_file.write(newline)
+                    splitted_file.write(line)
                 return
             if self.__row_count <= 1:
                 self.__buffer_file_lines += 1
                 buffer_file.write(line)
-                splitted_file.write(newline)
+                splitted_file.write(line)
                 return
             if line.find(self.__CELL_PREFIX) != -1:
-                splitted_file.write(newline)
+                splitted_file.write(line)
                 self.__column_num += 1
                 if self.__key_num >= self.__column_num:
                     begin_pos = line.find(self.__DATA_PREFIX)
@@ -295,13 +292,13 @@ class XmlSplitter:
                         self.__hashkey = "{" + value + "}"
                     else:
                         self.__hashkey = self.__hashkey + \
-                            "|" + "{" + value + "}"
+                            "{" + value + "}"
                     if self.__key_num == self.__column_num:
                         self.__keylist.append(self.__hashkey)
             elif line.find(self.__CELL_SUFFIX) != -1:
-                splitted_file.write(newline)
+                splitted_file.write(line)
             if line.find(self.__ROW_SUFFIX) != -1:
-                splitted_file.write(newline)
+                splitted_file.write(line)
 
     def __parse_subsheet(self, line: str, buffer_file, splitted_file):
         """
@@ -310,17 +307,16 @@ class XmlSplitter:
         :param buffer_file: the buffer xml file which excludes the splitted items
         :param splitted_file: the splitted xml file
         """
-        newline = line.strip() + self.__ABAP_CR_LF
         if self.__table_finish is True:
             self.__buffer_file_lines += 1
             buffer_file.write(line)
-            splitted_file.write(newline)
+            splitted_file.write(line)
             return
         if line.find(self.__TABLE_SUFFIX) != -1:
             self.__table_finish = True
             self.__buffer_file_lines += 1
             buffer_file.write(line)
-            splitted_file.write(newline)
+            splitted_file.write(line)
             return
         if line.find(self.__ROW_PREFIX) != -1:
             self.__row_count += 1
@@ -332,12 +328,12 @@ class XmlSplitter:
             else:
                 self.__buffer_file_lines += 1
                 buffer_file.write(line)
-                splitted_file.write(newline)
+                splitted_file.write(line)
             return
         if self.__row_count < 9:
             self.__buffer_file_lines += 1
             buffer_file.write(line)
-            splitted_file.write(newline)
+            splitted_file.write(line)
             return
         if line.find(self.__CELL_PREFIX) != -1:
             self.__subsheet_rowlist.append(line)
@@ -354,15 +350,14 @@ class XmlSplitter:
                 if self.__hashkey == "":
                     self.__hashkey = "{" + value + "}"
                 else:
-                    self.__hashkey = self.__hashkey + "|" + "{" + value + "}"
+                    self.__hashkey = self.__hashkey + "{" + value + "}"
         elif line.find(self.__CELL_SUFFIX) != -1:
             self.__subsheet_rowlist.append(line)
         if line.find(self.__ROW_SUFFIX) != -1:
             self.__subsheet_rowlist.append(line)
             if self.__hashkey in self.__keylist:
                 for row in self.__subsheet_rowlist:
-                    new_row = row.strip() + self.__ABAP_CR_LF
-                    splitted_file.write(new_row)
+                    splitted_file.write(row)
             else:
                 if len(self.__subsheet_rowlist) > 0:
                     self.__invalid = True
