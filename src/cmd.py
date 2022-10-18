@@ -12,7 +12,7 @@ def print_help():
     Print help document
     """
 
-    print("Split oversized MC files into smaller units which can then be fed into S/4 HANA Migration Cockpit File Staging approach for further processing of data provisioning.")
+    print("You can use this program to split a large SAP S/4HANA Migration Cockpit XML file into smaller files.")
     print("--version 1.0")
     print("")
 
@@ -24,28 +24,29 @@ def main():
     print_help()
     os.system("")
     while True:
-        filename = input("Please enter file name:")
+        filename = input(
+            "Enter the name of the XML file that you want to split into smaller files:")
         if filename == "":
-            print("\033[31mFile name cannot be empty\033[0m")
+            print("\033[31mYou did not enter a file name.\033[0m")
             continue
         uppercase_name = filename.upper()
         if uppercase_name.find(".XML") == -1:
-            print("\033[31minput file is not XML file\033[0m")
+            print("\033[31mThe specified file is not an XML file.\033[0m")
             continue
         if os.path.isfile(uppercase_name) is not True:
-            print(f"\033[31m{uppercase_name} does not exist\033[0m")
+            print(f"\033[31m{uppercase_name} does not exist.\033[0m")
             continue
         break
 
     while True:
-        num = input("Please enter the number of the splitted files:")
+        num = input("Enter the number of XML file that you want to generate:")
         try:
             file_num = int(num)
         except Exception:
-            print("\033[31mInput value should be numbers\033[0m")
+            print("\033[31mYou did not enter a number.\033[0m")
             continue
         if file_num <= 1:
-            print("\033[31mInput value should be bigger than 1\033[0m")
+            print("\033[31mSpecify a value greater than 1.\033[0m")
             continue
         break
 

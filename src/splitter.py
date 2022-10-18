@@ -138,7 +138,7 @@ class XmlSplitter:
         header_count = 0
         scan_main_finish = False
         if os.path.isfile(self.__file_fullname) is not True:
-            raise NameError(self.__file_fullname + " does not exist")
+            raise NameError(self.__file_fullname + " does not exist.")
         with open(self.__file_fullname, "r", encoding="utf-8") as original_file:
             for line in original_file:
                 self.__file_lines += 1
@@ -167,8 +167,11 @@ class XmlSplitter:
         print("")
 
         self.__instance_count = row_count
+        if self.__instance_count <= 1:
+            raise ValueError("There is no instance to be splitted.")
         if self.__instance_count < self.__file_num:
-            raise NameError("The number of splitted files is too big")
+            raise ValueError(
+                "The number of splitted files is more than the instances.")
         if self.__instance_count % self.__file_num == 0:
             self.__each_file_instances = self.__instance_count / self.__file_num
             self.__last_file_instances = self.__each_file_instances
@@ -188,7 +191,7 @@ class XmlSplitter:
             idx += 1
             finish = self.__create_file(str(idx))
             print("")
-        print("Done with splitting.")
+        print("Files generated successfully.")
 
     def __get_progress(self, filename: str) -> ProgressBar:
         """
@@ -201,7 +204,7 @@ class XmlSplitter:
             Percentage(),
             Bar("=")
         ]
-        progress_bar = ProgressBar(widgets=widgets).start()
+        progress_bar = ProgressBar(widgets=widgets, term_width=100).start()
         return progress_bar
 
     def __parse_main_sheet(self, line: str, buffer_file, splitted_file):
