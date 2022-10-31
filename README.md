@@ -28,4 +28,4 @@ Contains the Python source code which you can download and compile.
 None for the time being.
 
 ## How to obtain support
-As sample code, there is no guaranteed support and if you want to discuss the tool with other users, please go to [SAP Community](https://answers.sap.com/questions/ask.html).
+SAP does not provide support for the sample code, but you can discuss the tool with other users on the [SAP Community](https://answers.sap.com/questions/ask.html).
