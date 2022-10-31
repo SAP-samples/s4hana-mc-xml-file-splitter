@@ -1,4 +1,4 @@
-# S/4HANA Migration Cockpit XML File Splitter
+# SAP S/4HANA Migration Cockpit XML File Splitter
 Sample code for a command line interface program (implemented in Python) that can split a large SAP S/4HANA Migration Cockpit XML file into smaller files. Using smaller files can improve performance. Note that this program is only relevant for the migration approach "Migrate Data Using Staging Tables".
 
 ## Containing Files
@@ -29,3 +29,6 @@ None for the time being.
 
 ## How to obtain support
 SAP does not provide support for the sample code, but you can discuss the tool with other users on the [SAP Community](https://answers.sap.com/questions/ask.html).
+
+## License
+Copyright (c) 2022 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
