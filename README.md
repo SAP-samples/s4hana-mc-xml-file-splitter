@@ -24,7 +24,7 @@ Contains the guideline on the set up of Python and lib environment.
    * 3.1 The name of the XML file that you want to split into smaller files.
    * 3.2 The number of XML files that you want to generate.
    * 3.3 Press Enter to start the process and monitor the task progress in console output.
-3. You can compile the program yourself if required. You can download the source code and compile it in your local pre-installed Python environment.
+3. You can compile the program yourself if required. You can download the source code and compile it in your local pre-installed Python environment. You can read the help [doc](doc) to understand how to set up Python and lib environment.
 
 ## Known Issues
 None for the time being.
