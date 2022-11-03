@@ -11,6 +11,8 @@ Contains information about using the program.
 The folder contains a compiled executable file that you can already use.
 4. The src folder:
 Contains the Python source code which you can download and compile.
+5. The doc folder:
+Contains the guideline on the set up of Python and lib environment.
 
 ## Requirements
 1. A good working knowledge of the migration approach "Migrate Data Using Staging Tables", specifically with using and managing XML template files for data provisioning.
