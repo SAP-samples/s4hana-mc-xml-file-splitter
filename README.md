@@ -21,9 +21,9 @@ Contains information about Installing Python and required libraries.
 ## How to Run or Rebuild
 1. The .exe file contained in the bin folder can be downloaded and run independently on Windows OS without any additional settings or configuration steps.
 2. To run the File Splitter program, follow the command line prompt. You need to enter the following information:
-   * 3.1 The name of the XML file that you want to split into smaller files.
-   * 3.2 The number of XML files that you want to generate.
-   * 3.3 Press Enter to start the process and monitor the task progress in console output.
+   * 2.1 The name of the XML file that you want to split into smaller files.
+   * 2.2 The number of XML files that you want to generate.
+   * 2.3 Press Enter to start the process and monitor the task progress in console output.
 3. You can compile the program yourself if required. You can download the source code and compile it in your local pre-installed Python environment. For information about installing Python and required libraries, see the [Help](doc) document.
 
 ## Known Issues
