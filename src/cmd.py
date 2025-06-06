@@ -1,4 +1,4 @@
-# Copyright: 2022 SAP SE or an SAP affiliate company
+# Copyright: 2025 SAP SE or an SAP affiliate company
 #
 # License: Apache-2.0
 
